@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/Base64.sol";
 
 contract ChainBattles is ERC721URIStorage {
-    using Strings for unit256;
+    using Strings for uint256;
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -18,7 +18,7 @@ contract ChainBattles is ERC721URIStorage {
 
     }
 
-    function generateCharacter(uint256 tokenId) public returns (string memory){
+    function generateCharacter(uint256 tokenId) public view returns (string memory){
         bytes memory svg = abi.encodePacked(
             '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">',
             '<style>.base { fill: white; font-family: serif; font-size: 14px; }</style>',
@@ -40,7 +40,7 @@ contract ChainBattles is ERC721URIStorage {
         return levels.toString();
     }
 
-    function getTokenURI(uint256 tokenId) public returns (string memory){
+    function getTokenURI(uint256 tokenId) public view returns (string memory){
         bytes memory dataURI = abi.encodePacked(
             '{',
             '"name": "Chain Battles #', tokenId.toString(), '",',
