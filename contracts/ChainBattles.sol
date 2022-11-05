@@ -12,7 +12,14 @@ contract ChainBattles is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    mapping(uint256 => uint256) public tokenIdToLevels;
+    struct MetaData {
+        uint256 level;
+        uint256 speed;
+        uint256 strength;
+        uint256 life;
+    }
+
+    mapping(uint256 => MetaData) public tokenIdToMetaData;
 
     constructor() ERC721("Chain Battles", "CBTLS"){
 
@@ -23,8 +30,11 @@ contract ChainBattles is ERC721URIStorage {
             '<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">',
             '<style>.base { fill: white; font-family: serif; font-size: 14px; }</style>',
             '<rect width="100%" height="100%" fill="black" />',
-            '<text x="50%" y="40%" class="base" dominant-baseline="middle" text-anchor="middle">', "Warrior", '</text>',
-            '<text x="50%" y="50%" class="base" dominant-baseline="middle" text-anchor="middle">', "Levels: ", getLevels(tokenId), '</text>',
+            '<text x="50%" y="30%" class="base" dominant-baseline="middle" text-anchor="middle">', "Warrior", '</text>',
+            '<text x="50%" y="40%" class="base" dominant-baseline="middle" text-anchor="middle">', "Levels: ", getLevels(tokenId), '</text>',
+            '<text x="50%" y="50%" class="base" dominant-baseline="middle" text-anchor="middle">', "Life: ", getLife(tokenId), '</text>',
+            '<text x="50%" y="60%" class="base" dominant-baseline="middle" text-anchor="middle">', "Speed: ", getSpeed(tokenId), '</text>',
+            '<text x="50%" y="70%" class="base" dominant-baseline="middle" text-anchor="middle">', "Strength: ", getStrength(tokenId), '</text>',
             '</svg>'
         );
         return string(
@@ -36,8 +46,23 @@ contract ChainBattles is ERC721URIStorage {
     }
 
     function getLevels(uint256 tokenId) public view returns (string memory){
-        uint256 levels = tokenIdToLevels[tokenId];
+        uint256 levels = tokenIdToMetaData[tokenId].level;
         return levels.toString();
+    }
+
+    function getLife(uint256 tokenId) public view returns (string memory){
+        uint256 life = tokenIdToMetaData[tokenId].life;
+        return life.toString();
+    }
+
+    function getSpeed(uint256 tokenId) public view returns (string memory){
+        uint256 speed = tokenIdToMetaData[tokenId].speed;
+        return speed.toString();
+    }
+
+    function getStrength(uint256 tokenId) public view returns (string memory){
+        uint256 strength = tokenIdToMetaData[tokenId].strength;
+        return strength.toString();
     }
 
     function getTokenURI(uint256 tokenId) public view returns (string memory){
@@ -60,15 +85,21 @@ contract ChainBattles is ERC721URIStorage {
         _tokenIds.increment();
         uint256 newItemId = _tokenIds.current();
         _safeMint(msg.sender, newItemId);
-        tokenIdToLevels[newItemId] = 0;
+
+        tokenIdToMetaData[newItemId].level = 0;
+        tokenIdToMetaData[newItemId].life = 0;
+        tokenIdToMetaData[newItemId].speed = 0;
+        tokenIdToMetaData[newItemId].strength = 0;
         _setTokenURI(newItemId, getTokenURI(newItemId));
     }
 
     function train(uint256 tokenId) public {
         require(_exists(tokenId), "Please use an Existing Token");
         require(ownerOf(tokenId) == msg.sender, "You must own this token to train it");
-        uint256 currentLevel = tokenIdToLevels[tokenId];
-        tokenIdToLevels[tokenId] = currentLevel + 1;
+        tokenIdToMetaData[tokenId].level++;
+        tokenIdToMetaData[tokenId].life++;
+        tokenIdToMetaData[tokenId].speed++;
+        tokenIdToMetaData[tokenId].strength++;
         _setTokenURI(tokenId, getTokenURI(tokenId));
     }
 }
